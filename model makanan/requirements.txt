@@ -1,0 +1,8 @@
+torch
+torchvision
+timm
+ttach
+opencv-python-headless
+pandas
+pillow
+gradio
