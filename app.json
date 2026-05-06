@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "AKSANUSA",
+    "slug": "aksanusa",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTabletMode": true,
+      "bundleIdentifier": "com.aksanusa.app"
+    },
+    "android": {
+      "package": "com.aksanusa.app"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "AKSANUSA memerlukan akses kamera untuk menampilkan preview dan mengenali makanan."
+        }
+      ]
+    ],
+    "web": {
+      "bundler": "metro"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "aksanusa-project"
+      }
+    }
+  }
+}
