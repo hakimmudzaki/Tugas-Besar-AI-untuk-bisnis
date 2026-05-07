@@ -28,7 +28,6 @@ export default function FoodScreen({ navigation }) {
   const cameraRef = useRef(null);
 
   const handleCapture = async () => {
-    setIsLoading(true);
     try {
       if (!cameraReady || !cameraRef.current) {
         Alert.alert('Info', 'Kamera masih menyiapkan preview, coba lagi sebentar.');
@@ -44,6 +43,8 @@ export default function FoodScreen({ navigation }) {
       const capturedPhoto = await cameraRef.current.takePictureAsync({
         quality: 0.8,
       });
+
+      setIsLoading(true);
 
       if (!capturedPhoto?.uri) {
         Alert.alert('Info', 'Kamera belum siap, coba beberapa saat lagi.');
@@ -134,11 +135,7 @@ export default function FoodScreen({ navigation }) {
                   ref={cameraRef}
                   style={styles.cameraPreview}
                   facing="back"
-                  ratio="4:3"
                   onCameraReady={() => setCameraReady(true)}
-                  onMountError={(event) => {
-                    Alert.alert('Error kamera', event.nativeEvent.message);
-                  }}
                 />
 
                 {/* Camera Icon */}
