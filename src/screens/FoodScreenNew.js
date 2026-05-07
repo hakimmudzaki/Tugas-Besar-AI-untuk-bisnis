@@ -56,7 +56,7 @@ export default function FoodScreen({ navigation }) {
       const confidenceScore = prediction?.confidence || 0;
 
       // Search food details from JSON
-      const details = getFoodDetails(predictedFoodName);
+      const details = getFoodDetails(predictedFoodName.label);
 
       if (details) {
         setFoodName(details.nama);
@@ -89,7 +89,7 @@ export default function FoodScreen({ navigation }) {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← Kembali</Text>
+          <Text style={styles.backButtonText}> Kembali</Text>
         </TouchableOpacity>
       </View>
 

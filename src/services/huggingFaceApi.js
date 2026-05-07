@@ -1,45 +1,99 @@
-const HF_API_URL = 'https://api-inference.huggingface.co/models/hakimgans/indonesia_food_model';
-const HF_API_KEY = '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';
+const GRADIO_API_URL =
+  'https://hakimgans-indonesia-food-model.hf.space';
 
 export const queryHuggingFaceModel = async (imageUri) => {
   try {
+    // Ambil image blob
     const imageResponse = await fetch(imageUri);
     const imageBlob = await imageResponse.blob();
 
-    // Send to Hugging Face API
-    const result = await fetch(HF_API_URL, {
-      headers: {
-        Authorization: `Bearer ${HF_API_KEY}`,
-        'Content-Type': 'application/octet-stream',
-      },
-      method: 'POST',
-      body: imageBlob,
+    // Upload file ke gradio
+    const formData = new FormData();
+
+    formData.append('files', {
+      uri: imageUri,
+      type: 'image/jpeg',
+      name: 'image.jpg',
     });
 
-    const data = await result.json();
+    // 1. Upload file
+    const uploadRes = await fetch(
+      `${GRADIO_API_URL}/gradio_api/upload`,
+      {
+        method: 'POST',
+        body: formData,
+      }
+    );
 
-    if (!result.ok) {
-      throw new Error(data?.error || 'Hugging Face API returned an error');
+    console.log('UPLOAD STATUS:', uploadRes.status);
+
+    const uploadData = await uploadRes.json();
+
+    console.log('UPLOAD DATA:', uploadData);
+
+    const uploadedPath = uploadData[0];
+
+    // 2. Predict
+    const predictRes = await fetch(
+      `${GRADIO_API_URL}/gradio_api/call/predict_food`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          data: [
+            {
+              path: uploadedPath,
+            },
+          ],
+        }),
+      }
+    );
+
+    console.log('PREDICT STATUS:', predictRes.status);
+
+    const predictData = await predictRes.json();
+
+    console.log('PREDICT DATA:', predictData);
+
+    const eventId = predictData.event_id;
+
+    // 3. Ambil hasil
+    const resultRes = await fetch(
+      `${GRADIO_API_URL}/gradio_api/call/predict_food/${eventId}`
+    );
+
+    const resultText = await resultRes.text();
+
+    console.log('RAW RESULT:', resultText);
+
+    // Parse SSE
+    const lines = resultText.split('\n');
+
+    let finalResult = null;
+
+    for (const line of lines) {
+      if (line.startsWith('data:')) {
+        const jsonStr = line.replace('data:', '').trim();
+
+        try {
+          finalResult = JSON.parse(jsonStr);
+        } catch (e) {}
+      }
     }
 
-    if (data?.error === 'Model hakimgans/indonesia_food_model is currently loading') {
-      throw new Error('Model masih loading, coba beberapa detik lagi.');
+    if (!finalResult) {
+      throw new Error('Prediksi gagal diparse');
     }
 
-    // Parse response - typically returns array of predictions
-    if (Array.isArray(data) && data.length > 0) {
-      // Get the top prediction (highest confidence)
-      const topPrediction = data[0];
-      return {
-        foodName: topPrediction.label || 'Unknown',
-        confidence: topPrediction.score || 0,
-        predictions: data,
-      };
-    }
-
-    return null;
+    return {
+      foodName: finalResult[0] || 'Unknown',
+      confidence: finalResult[1] || 0,
+      raw: finalResult,
+    };
   } catch (error) {
-    console.error('Error querying Hugging Face API:', error);
+    console.error('Error querying Gradio API:', error);
     throw error;
   }
 };

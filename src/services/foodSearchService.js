@@ -5,7 +5,8 @@ import foodData from '../data/foodData.json';
  */
 export const searchFoodByName = (foodName) => {
   if (!foodName) return null;
-
+  console.log("foodName:", foodName);
+  console.log("type:", typeof foodName);
   // Exact match
   let food = foodData.find(
     (f) => f['Nama Makanan'].toLowerCase() === foodName.toLowerCase()

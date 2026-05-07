@@ -86,7 +86,7 @@ export default function HomeMenuScreen({ navigation }) {
                 </View>
 
                 <Text style={[styles.arrow, item.disabled && styles.arrowDisabled]}>
-                  {item.disabled ? '' : '→'}
+                  {item.disabled ? '' : ''}
                 </Text>
               </LinearGradient>
             </TouchableOpacity>

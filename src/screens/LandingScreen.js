@@ -56,7 +56,7 @@ export default function LandingScreen({ navigation }) {
               style={styles.ctaGradient}
             >
               <Text style={styles.ctaButtonText}>Get Started</Text>
-              <Text style={styles.ctaArrow}> → </Text>
+              <Text style={styles.ctaArrow}>  </Text>
             </LinearGradient>
           </TouchableOpacity>
         </View>
