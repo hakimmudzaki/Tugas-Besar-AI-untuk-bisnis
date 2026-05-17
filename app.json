@@ -8,6 +8,7 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "icon": "./assets/icon.png",
     "ios": {
       "supportsTabletMode": true,
       "bundleIdentifier": "com.aksanusa.app"

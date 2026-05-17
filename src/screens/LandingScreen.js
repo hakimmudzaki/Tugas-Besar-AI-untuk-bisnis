@@ -79,7 +79,7 @@ export default function LandingScreen({ navigation }) {
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>© 2024 AKSANUSA</Text>
+          <Text style={styles.footerText}>© 2026 AKSANUSA</Text>
           <Text style={styles.footerSubtext}>Scan and Explore Indonesian Culture</Text>
         </View>
       </ScrollView>
@@ -271,12 +271,13 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   finalCTASection: {
-    marginHorizontal: 20,
-    borderRadius: 16,
-    padding: 30,
-    marginVertical: 40,
-    alignItems: 'center',
-  },
+  marginHorizontal: 20,
+  borderRadius: 16,
+  padding: 30,
+  marginTop: 10,    
+  marginBottom: 40, 
+  alignItems: 'center',
+},
   finalCTATitle: {
     fontSize: 26,
     fontWeight: 'bold',
