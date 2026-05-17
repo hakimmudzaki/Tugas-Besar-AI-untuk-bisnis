@@ -27,7 +27,7 @@ export default function HomeMenuScreen({ navigation }) {
       color: '#2d6b42',
       description: 'Tanya jawab tentang budaya',
       screen: 'Chatbot',
-      disabled: true,
+      disabled: false,
     },
     {
       id: 3,

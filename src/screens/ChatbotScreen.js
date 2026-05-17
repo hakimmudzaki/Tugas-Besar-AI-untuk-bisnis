@@ -9,8 +9,10 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import GeminiService from '../services/geminiService';
 
 export default function ChatbotScreen({ navigation }) {
   const [messages, setMessages] = useState([
@@ -30,18 +32,30 @@ export default function ChatbotScreen({ navigation }) {
         sender: 'user',
       };
       setMessages([...messages, userMessage]);
-
-      // Simulasi response bot
-      setTimeout(() => {
-        const botResponse = {
-          id: messages.length + 2,
-          text: 'Terima kasih atas pertanyaan Anda! Fitur chatbot AI sedang dalam tahap pengembangan untuk memberikan jawaban yang lebih akurat.',
-          sender: 'bot',
-        };
-        setMessages((prev) => [...prev, botResponse]);
-      }, 500);
-
+      const tempBotMessage = {
+        id: messages.length + 2,
+        text: '...',
+        sender: 'bot',
+        loading: true,
+      };
+      setMessages((prev) => [...prev, tempBotMessage]);
+      const prompt = inputText;
       setInputText('');
+
+      (async () => {
+        try {
+          const response = await GeminiService.sendMessage(prompt);
+          setMessages((prev) =>
+            prev.map((m) => (m.id === tempBotMessage.id ? { ...m, text: response, loading: false } : m))
+          );
+        } catch (e) {
+          const fallback = 'Maaf, terjadi kesalahan saat menghubungi layanan AI.';
+          setMessages((prev) =>
+            prev.map((m) => (m.id === tempBotMessage.id ? { ...m, text: fallback, loading: false } : m))
+          );
+          console.warn('Gemini error:', e.message);
+        }
+      })();
     }
   };
 
@@ -73,14 +87,21 @@ export default function ChatbotScreen({ navigation }) {
                   message.sender === 'user' ? styles.userMessage : styles.botMessage,
                 ]}
               >
-                <Text
-                  style={[
-                    styles.messageText,
-                    message.sender === 'user' ? styles.userMessageText : styles.botMessageText,
-                  ]}
-                >
-                  {message.text}
-                </Text>
+                {message.loading ? (
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <ActivityIndicator size="small" color="#666" />
+                    <Text style={styles.botMessageText}>Sedang mengetik...</Text>
+                  </View>
+                ) : (
+                  <Text
+                    style={[
+                      styles.messageText,
+                      message.sender === 'user' ? styles.userMessageText : styles.botMessageText,
+                    ]}
+                  >
+                    {message.text}
+                  </Text>
+                )}
               </View>
             </View>
           ))}
