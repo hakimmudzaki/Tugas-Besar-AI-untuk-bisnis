@@ -126,16 +126,14 @@ export async function sendMessage(prompt, apiKeyParam) {
 
   // 1. Updated to standard v1 endpoint and switched from generateText to generateContent
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${DEFAULT_MODEL}:generateContent?key=${apiKey}`;
+  const scopedPrompt = `${NUSANTARA_SCOPE_INSTRUCTION}\n\nPertanyaan pengguna: ${cleanPrompt}\n\nJawab hanya jika konteksnya masakan Nusantara atau arsitektur Nusantara. Jika pertanyaan di luar konteks, tolak dengan sopan.`;
   
   // 2. Updated the body to match the current Content/Parts schema
   const body = {
-    systemInstruction: {
-      parts: [{ text: NUSANTARA_SCOPE_INSTRUCTION }],
-    },
     contents: [
       {
         parts: [
-          { text: cleanPrompt }
+          { text: scopedPrompt }
         ]
       }
     ]

@@ -8,33 +8,38 @@ import {
   ScrollView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useLanguage } from '../context/LanguageContext';
+import LanguageToggle from '../components/LanguageToggle';
 
 export default function HomeMenuScreen({ navigation }) {
+  const { texts } = useLanguage();
+  const text = texts.home;
+
   const menuItems = [
     {
       id: 1,
-      title: 'Arsitektur',
+      title: text.architecture.title,
       icon: '🏛️',
       color: '#1a472a',
-      description: 'Jelajahi rumah adat Indonesia',
+      description: text.architecture.description,
       screen: 'Architecture',
       disabled: true,
     },
     {
       id: 2,
-      title: 'Chatbot',
+      title: text.chatbot.title,
       icon: '💬',
       color: '#2d6b42',
-      description: 'Tanya jawab tentang budaya',
+      description: text.chatbot.description,
       screen: 'Chatbot',
       disabled: false,
     },
     {
       id: 3,
-      title: 'Makanan',
+      title: text.food.title,
       icon: '🍲',
       color: '#3d7d52',
-      description: 'Pelajari makanan tradisional',
+      description: text.food.description,
       screen: 'Food',
       disabled: false,
     },
@@ -50,8 +55,13 @@ export default function HomeMenuScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>AKSANUSA</Text>
-          <Text style={styles.headerSubtitle}>Pilih kategori yang ingin dijelajahi</Text>
+          <View style={styles.headerRow}>
+            <View style={styles.headerTitleBlock}>
+              <Text style={styles.headerTitle}>{text.title}</Text>
+              <Text style={styles.headerSubtitle}>{text.subtitle}</Text>
+            </View>
+            <LanguageToggle />
+          </View>
         </View>
 
         <View style={styles.menuContainer}>
@@ -82,7 +92,7 @@ export default function HomeMenuScreen({ navigation }) {
                 <View style={styles.textContainer}>
                   <Text style={styles.menuTitle}>{item.title}</Text>
                   <Text style={styles.menuDescription}>{item.description}</Text>
-                  {item.disabled && <Text style={styles.comingSoonText}>Coming Soon</Text>}
+                  {item.disabled && <Text style={styles.comingSoonText}>{texts.common.comingSoon}</Text>}
                 </View>
 
                 <Text style={[styles.arrow, item.disabled && styles.arrowDisabled]}>
@@ -94,11 +104,8 @@ export default function HomeMenuScreen({ navigation }) {
         </View>
 
         <View style={styles.infoSection}>
-          <Text style={styles.infoTitle}>Tentang AKSANUSA</Text>
-          <Text style={styles.infoText}>
-            Aplikasi ini dirancang untuk membantu Anda menjelajahi kekayaan budaya Indonesia.
-            Dari arsitektur tradisional hingga kuliner, semuanya ada di sini!
-          </Text>
+          <Text style={styles.infoTitle}>{text.aboutTitle}</Text>
+          <Text style={styles.infoText}>{text.aboutText}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -115,9 +122,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   header: {
-    alignItems: 'center',
     paddingVertical: 40,
     paddingHorizontal: 20,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  headerTitleBlock: {
+    flex: 1,
+    paddingRight: 8,
   },
   headerTitle: {
     fontSize: 42,

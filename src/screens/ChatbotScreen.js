@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -13,16 +13,36 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import GeminiService from '../services/geminiService';
+import { useLanguage } from '../context/LanguageContext';
+import LanguageToggle from '../components/LanguageToggle';
 
 export default function ChatbotScreen({ navigation }) {
+  const { texts } = useLanguage();
+  const text = texts.chatbot;
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: 'Halo! Saya adalah chatbot AKSANUSA. Tanyakan apa saja tentang budaya Indonesia!',
+      text: text.initialMessage,
       sender: 'bot',
     },
   ]);
   const [inputText, setInputText] = useState('');
+
+  useEffect(() => {
+    setMessages((prev) => {
+      if (prev.length === 1 && prev[0]?.sender === 'bot') {
+        return [
+          {
+            id: 1,
+            text: text.initialMessage,
+            sender: 'bot',
+          },
+        ];
+      }
+
+      return prev;
+    });
+  }, [text.initialMessage]);
 
   const handleSendMessage = () => {
     if (inputText.trim()) {
@@ -49,7 +69,7 @@ export default function ChatbotScreen({ navigation }) {
             prev.map((m) => (m.id === tempBotMessage.id ? { ...m, text: response, loading: false } : m))
           );
         } catch (e) {
-          const fallback = 'Maaf, terjadi kesalahan saat menghubungi layanan AI.';
+          const fallback = text.fallbackError;
           setMessages((prev) =>
             prev.map((m) => (m.id === tempBotMessage.id ? { ...m, text: fallback, loading: false } : m))
           );
@@ -62,10 +82,13 @@ export default function ChatbotScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← Kembali</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Chatbot AKSANUSA</Text>
+        <View style={styles.headerRow}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Text style={styles.backButtonText}>{texts.common.back}</Text>
+          </TouchableOpacity>
+          <LanguageToggle />
+        </View>
+        <Text style={styles.headerTitle}>{text.title}</Text>
       </View>
 
       <KeyboardAvoidingView
@@ -110,7 +133,7 @@ export default function ChatbotScreen({ navigation }) {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.textInput}
-            placeholder="Ketik pertanyaan Anda..."
+            placeholder={text.placeholder}
             placeholderTextColor="#999"
             value={inputText}
             onChangeText={setInputText}
@@ -128,7 +151,7 @@ export default function ChatbotScreen({ navigation }) {
               end={{ x: 1, y: 1 }}
               style={styles.sendButtonGradient}
             >
-              <Text style={styles.sendButtonText}>Kirim</Text>
+              <Text style={styles.sendButtonText}>{text.send}</Text>
             </LinearGradient>
           </TouchableOpacity>
         </View>
@@ -147,8 +170,15 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     backgroundColor: '#1a472a',
   },
-  backButton: {
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     marginBottom: 12,
+    gap: 12,
+  },
+  backButton: {
+    paddingVertical: 4,
   },
   backButtonText: {
     fontSize: 16,

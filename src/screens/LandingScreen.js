@@ -10,10 +10,14 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useLanguage } from '../context/LanguageContext';
+import LanguageToggle from '../components/LanguageToggle';
 
 const { width, height } = Dimensions.get('window');
 
 export default function LandingScreen({ navigation }) {
+  const { texts } = useLanguage();
+  const text = texts.landing;
   const [activeSection, setActiveSection] = useState('home');
 
   const handleGetStarted = () => {
@@ -25,6 +29,9 @@ export default function LandingScreen({ navigation }) {
       <ScrollView showsVerticalScrollIndicator={false} scrollEventThrottle={16}>
         {/* Hero Section */}
         <View style={styles.heroSection}>
+          <View style={styles.languageWrapper}>
+            <LanguageToggle />
+          </View>
           <Image
             source={require('../../foto/rumah.jpg')}
             style={styles.heroImage}
@@ -38,10 +45,8 @@ export default function LandingScreen({ navigation }) {
           >
             <View style={styles.heroContent}>
               <Text style={styles.heroTitle}>AKSANUSA</Text>
-              <Text style={styles.heroSubtitle}>The Guide in Your Pocket!</Text>
-              <Text style={styles.heroDescription}>
-                Scan and Explore Indonesian cultural with ease
-              </Text>
+              <Text style={styles.heroSubtitle}>{text.heroSubtitle}</Text>
+              <Text style={styles.heroDescription}>{text.heroDescription}</Text>
             </View>
           </LinearGradient>
         </View>
@@ -55,7 +60,7 @@ export default function LandingScreen({ navigation }) {
               end={{ x: 1, y: 1 }}
               style={styles.ctaGradient}
             >
-              <Text style={styles.ctaButtonText}>Get Started</Text>
+              <Text style={styles.ctaButtonText}>{texts.common.getStarted}</Text>
               <Text style={styles.ctaArrow}>  </Text>
             </LinearGradient>
           </TouchableOpacity>
@@ -68,19 +73,17 @@ export default function LandingScreen({ navigation }) {
           end={{ x: 1, y: 1 }}
           style={styles.finalCTASection}
         >
-          <Text style={styles.finalCTATitle}>Ready to Explore?</Text>
-          <Text style={styles.finalCTADescription}>
-            Join thousands discovering Indonesia's cultural treasures
-          </Text>
+          <Text style={styles.finalCTATitle}>{text.readyTitle}</Text>
+          <Text style={styles.finalCTADescription}>{text.readyDescription}</Text>
           <TouchableOpacity style={styles.downloadButton} onPress={handleGetStarted}>
-            <Text style={styles.downloadButtonText}>Start Exploring</Text>
+            <Text style={styles.downloadButtonText}>{texts.common.startExploring}</Text>
           </TouchableOpacity>
         </LinearGradient>
 
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>© 2026 AKSANUSA</Text>
-          <Text style={styles.footerSubtext}>Scan and Explore Indonesian Culture</Text>
+          <Text style={styles.footerSubtext}>{text.footerText}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -96,6 +99,12 @@ const styles = StyleSheet.create({
     width: '100%',
     height: height * 0.5,
     position: 'relative',
+  },
+  languageWrapper: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    zIndex: 5,
   },
   heroImage: {
     width: '100%',

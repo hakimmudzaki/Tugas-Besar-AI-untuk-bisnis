@@ -9,15 +9,23 @@ import {
   Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useLanguage } from '../context/LanguageContext';
+import LanguageToggle from '../components/LanguageToggle';
 
 export default function ArchitectureScreen({ navigation }) {
+  const { texts } = useLanguage();
+  const text = texts.architecture;
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← Kembali</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Arsitektur Tradisional</Text>
+        <View style={styles.headerRow}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Text style={styles.backButtonText}>{texts.common.back}</Text>
+          </TouchableOpacity>
+          <LanguageToggle />
+        </View>
+        <Text style={styles.headerTitle}>{text.headerTitle}</Text>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -28,24 +36,21 @@ export default function ArchitectureScreen({ navigation }) {
         />
 
         <View style={styles.content}>
-          <Text style={styles.title}>Rumah Adat Indonesia</Text>
-          <Text style={styles.description}>
-            Rumah adat Indonesia merupakan warisan budaya yang kaya dan beragam. Setiap daerah memiliki
-            arsitektur unik yang mencerminkan nilai-nilai budaya, iklim, dan bahan baku lokal yang tersedia.
-          </Text>
+          <Text style={styles.title}>{text.title}</Text>
+          <Text style={styles.description}>{text.description}</Text>
 
-          <Text style={styles.sectionTitle}>Karakteristik Utama</Text>
+          <Text style={styles.sectionTitle}>{text.sectionTitle}</Text>
           <View style={styles.featureItem}>
             <Text style={styles.featureBullet}>•</Text>
-            <Text style={styles.featureText}>Desain yang disesuaikan dengan iklim tropis</Text>
+            <Text style={styles.featureText}>{text.bullet1}</Text>
           </View>
           <View style={styles.featureItem}>
             <Text style={styles.featureBullet}>•</Text>
-            <Text style={styles.featureText}>Menggunakan bahan-bahan alami lokal</Text>
+            <Text style={styles.featureText}>{text.bullet2}</Text>
           </View>
           <View style={styles.featureItem}>
             <Text style={styles.featureBullet}>•</Text>
-            <Text style={styles.featureText}>Penuh dengan ornamen dan makna filosofi</Text>
+            <Text style={styles.featureText}>{text.bullet3}</Text>
           </View>
 
           <LinearGradient
@@ -54,9 +59,9 @@ export default function ArchitectureScreen({ navigation }) {
             end={{ x: 1, y: 1 }}
             style={styles.ctaSection}
           >
-            <Text style={styles.ctaText}>Jelajahi lebih banyak tentang arsitektur tradisional</Text>
+            <Text style={styles.ctaText}>{text.ctaText}</Text>
             <TouchableOpacity style={styles.ctaButton}>
-              <Text style={styles.ctaButtonText}>Pelajari Selengkapnya →</Text>
+              <Text style={styles.ctaButtonText}>{text.ctaButton}</Text>
             </TouchableOpacity>
           </LinearGradient>
         </View>
@@ -75,8 +80,15 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     backgroundColor: '#1a472a',
   },
-  backButton: {
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     marginBottom: 12,
+    gap: 12,
+  },
+  backButton: {
+    paddingVertical: 4,
   },
   backButtonText: {
     fontSize: 16,
