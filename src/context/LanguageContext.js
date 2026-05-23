@@ -5,8 +5,8 @@ export const TEXTS = {
     common: {
       back: '← Kembali',
       comingSoon: 'Segera Hadir',
-      getStarted: 'Get Started',
-      startExploring: 'Start Exploring',
+      getStarted: 'Mulai Sekarang',
+      startExploring: 'Mulai Menjelajah',
       learnMore: 'Pelajari Selengkapnya',
       learnMoreArrow: 'Pelajari Selengkapnya →',
       tryAgain: 'Coba Lagi',

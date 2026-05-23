@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ScrollView,
+  Platform,
+  StatusBar,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLanguage } from '../context/LanguageContext';
@@ -57,7 +59,7 @@ export default function HomeMenuScreen({ navigation }) {
         <View style={styles.header}>
           <View style={styles.headerRow}>
             <View style={styles.headerTitleBlock}>
-              <Text style={styles.headerTitle}>{text.title}</Text>
+              <Text style={styles.headerTitle} adjustsFontSizeToFit numberOfLines={1}>{text.title}</Text>
               <Text style={styles.headerSubtitle}>{text.subtitle}</Text>
             </View>
             <LanguageToggle />
@@ -116,10 +118,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'space-between',
+    paddingBottom: 50,
   },
   header: {
     paddingVertical: 40,
@@ -136,15 +140,15 @@ const styles = StyleSheet.create({
     paddingRight: 8,
   },
   headerTitle: {
-    fontSize: 42,
+    fontSize: 36,
     fontWeight: 'bold',
     color: '#1a472a',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   headerSubtitle: {
     fontSize: 16,
     color: '#666',
-    textAlign: 'center',
+    textAlign: 'left',
   },
   menuContainer: {
     paddingHorizontal: 20,

@@ -7,6 +7,8 @@ import {
   SafeAreaView,
   ScrollView,
   Image,
+  Platform,
+  StatusBar,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLanguage } from '../context/LanguageContext';
@@ -77,7 +79,8 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingBottom: 16,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 16 : 16,
     backgroundColor: '#1a472a',
   },
   headerRow: {

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   StyleSheet,
   View,
@@ -8,74 +8,59 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
+  Platform,
+  StatusBar,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { ExpandableSection, InfoCard, SpiceLevelBadge } from '../components/FoodDetailComponents';
 import { getFoodDetails } from '../services/foodSearchService';
 import { queryHuggingFaceModel } from '../services/huggingFaceApi';
-import { useLanguage } from '../context/LanguageContext';
-import LanguageToggle from '../components/LanguageToggle';
 
 export default function FoodScreen({ navigation }) {
-  const { texts, language } = useLanguage();
-  const text = texts.food;
   const [isLoading, setIsLoading] = useState(false);
   const [cameraReady, setCameraReady] = useState(false);
-  const [foodName, setFoodName] = useState(text.defaultTitle);
-  const [description, setDescription] = useState(text.instruction);
+  const [foodName, setFoodName] = useState('Nama Makanan');
+  const [description, setDescription] = useState(
+    'Arahkan kamera ke makanan yang ingin Anda identifikasi'
+  );
   const [foodDetails, setFoodDetails] = useState(null);
   const [confidence, setConfidence] = useState(0);
-  const [lastPredictedFoodName, setLastPredictedFoodName] = useState(null);
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef(null);
-
-  useEffect(() => {
-    if (lastPredictedFoodName) {
-      const refreshedDetails = getFoodDetails(lastPredictedFoodName, language);
-      if (refreshedDetails) {
-        setFoodName(refreshedDetails.nama);
-        setDescription(refreshedDetails.deskripsi);
-        setFoodDetails(refreshedDetails);
-      }
-      return;
-    }
-
-    setFoodName(text.defaultTitle);
-    setDescription(text.instruction);
-  }, [language]);
 
   const handleCapture = async () => {
     try {
       if (!cameraReady || !cameraRef.current) {
-        Alert.alert('Info', text.cameraNotReady);
+        Alert.alert('Info', 'Kamera masih menyiapkan preview, coba lagi sebentar.');
         return;
       }
 
       if (!permission?.granted) {
         await requestPermission();
-        Alert.alert(text.permissionTitle, text.cameraPermissionNeed);
+        Alert.alert('Izin kamera diperlukan', 'Aktifkan akses kamera untuk menampilkan preview dan mengambil foto.');
         return;
       }
 
       const capturedPhoto = await cameraRef.current.takePictureAsync({
         quality: 0.8,
+        base64: true,
       });
 
       setIsLoading(true);
 
       if (!capturedPhoto?.uri) {
-        Alert.alert('Info', text.cameraWait);
+        Alert.alert('Info', 'Kamera belum siap, coba beberapa saat lagi.');
         return;
       }
 
-      const prediction = await queryHuggingFaceModel(capturedPhoto.uri);
+      const prediction = await queryHuggingFaceModel(capturedPhoto.uri, capturedPhoto.base64);
+
       const predictedFoodName = prediction?.foodName || 'Rendang';
       const confidenceScore = prediction?.confidence || 0;
-      setLastPredictedFoodName(predictedFoodName);
 
       // Search food details from JSON
-      const details = getFoodDetails(predictedFoodName, language);
+      const details = getFoodDetails(predictedFoodName);
 
       if (details) {
         setFoodName(details.nama);
@@ -83,24 +68,23 @@ export default function FoodScreen({ navigation }) {
         setFoodDetails(details);
         setConfidence((confidenceScore * 100).toFixed(1));
       } else {
-        Alert.alert('Info', text.infoNotFound);
-        setFoodName(text.defaultTitle);
-        setDescription(text.infoNotFoundDesc);
+        Alert.alert('Info', 'Makanan tidak ditemukan dalam database');
+        setFoodName('Tidak Dikenal');
+        setDescription('Model berhasil mendeteksi gambar, tetapi data detail makanan belum tersedia di database.');
       }
     } catch (error) {
       setIsLoading(false);
-      Alert.alert('Error', text.errorAnalyzePrefix + error.message);
+      Alert.alert('Error', 'Gagal menganalisis: ' + error.message);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleReset = () => {
-    setFoodName(text.defaultTitle);
-    setDescription(text.instruction);
+    setFoodName('Nama Makanan');
+    setDescription('Arahkan kamera ke makanan yang ingin Anda identifikasi');
     setFoodDetails(null);
     setConfidence(0);
-    setLastPredictedFoodName(null);
     setCameraReady(false);
   };
 
@@ -108,12 +92,9 @@ export default function FoodScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <View style={styles.headerRow}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Text style={styles.backButtonText}>{texts.common.back}</Text>
-          </TouchableOpacity>
-          <LanguageToggle />
-        </View>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Text style={styles.backButtonText}>← Kembali</Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView
@@ -124,7 +105,9 @@ export default function FoodScreen({ navigation }) {
         {/* Food Name Title */}
         <View style={styles.titleContainer}>
           <Text style={styles.foodTitle}>{foodName}</Text>
-          {confidence > 0 && <Text style={styles.confidenceText}>{text.confidencePrefix}: {confidence}%</Text>}
+          {confidence > 0 && (
+            <Text style={styles.confidenceText}>Kepercayaan: {confidence}%</Text>
+          )}
         </View>
 
         {/* Camera View */}
@@ -133,20 +116,22 @@ export default function FoodScreen({ navigation }) {
             {!permission ? (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#D4AF37" />
-                <Text style={styles.loadingText}>{text.loading}</Text>
+                <Text style={styles.loadingText}>Menyiapkan kamera...</Text>
               </View>
             ) : !permission.granted ? (
               <View style={styles.permissionContainer}>
-                <Text style={styles.permissionTitle}>{text.permissionTitle}</Text>
-                <Text style={styles.permissionText}>{text.permissionText}</Text>
+                <Text style={styles.permissionTitle}>Akses kamera belum aktif</Text>
+                <Text style={styles.permissionText}>
+                  Aktifkan izin kamera untuk melihat preview langsung dan mengambil foto makanan.
+                </Text>
                 <TouchableOpacity style={styles.permissionButton} onPress={requestPermission}>
-                  <Text style={styles.permissionButtonText}>{text.permissionButton}</Text>
+                  <Text style={styles.permissionButtonText}>Aktifkan Kamera</Text>
                 </TouchableOpacity>
               </View>
             ) : isLoading ? (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#D4AF37" />
-                <Text style={styles.loadingText}>{text.analyzing}</Text>
+                <Text style={styles.loadingText}>Menganalisis...</Text>
               </View>
             ) : (
               <>
@@ -185,11 +170,13 @@ export default function FoodScreen({ navigation }) {
         </View>
 
         {/* Instruction Text */}
-        <Text style={styles.instructionText}>{text.instruction}</Text>
+        <Text style={styles.instructionText}>
+          Posisikan makanan di tengah frame untuk hasil identifikasi yang lebih akurat
+        </Text>
 
         {/* Description Box */}
         <View style={styles.descriptionBox}>
-          <Text style={styles.descriptionLabel}>{text.descriptionLabel}</Text>
+          <Text style={styles.descriptionLabel}>Deskripsi</Text>
           <Text style={styles.descriptionText}>{description}</Text>
         </View>
 
@@ -198,35 +185,41 @@ export default function FoodScreen({ navigation }) {
           <View style={styles.detailsSection}>
             {/* Quick Info Row */}
             <View style={styles.quickInfoRow}>
-              <InfoCard label={text.details.origin} value={foodDetails.daerahAsal} />
+              <InfoCard label="Daerah Asal" value={foodDetails.daerahAsal} />
               <View style={styles.spiceContainer}>
-                <Text style={styles.spiceLabel}>{text.details.spice}</Text>
+                <Text style={styles.spiceLabel}>Tingkat Pedas</Text>
                 <SpiceLevelBadge level={foodDetails.spiciness} size="large" />
               </View>
             </View>
 
             {/* Expandable Sections */}
             <ExpandableSection
-              title={text.details.ingredients}
+              title="Bahan Utama & Rempah"
               content={foodDetails.bahanUtama}
             />
 
-            <ExpandableSection title={text.details.howToMake} content={foodDetails.caraMembuat} />
+            <ExpandableSection
+              title="Cara Membuat"
+              content={foodDetails.caraMembuat}
+            />
 
             <ExpandableSection
-              title={text.details.nutrition}
+              title="Estimasi Kalori & Nutrisi"
               content={foodDetails.kalori}
             />
 
             <ExpandableSection
-              title={text.details.allergens}
-              content={foodDetails.alergen === '-' ? text.details.noAllergen : foodDetails.alergen}
+              title="Alergen"
+              content={foodDetails.alergen === '-' ? 'Tidak ada alergen utama' : foodDetails.alergen}
             />
 
-            <ExpandableSection title={text.details.philosophy} content={foodDetails.filosofi} />
+            <ExpandableSection
+              title="Filosofi & Sejarah"
+              content={foodDetails.filosofi}
+            />
 
             <ExpandableSection
-              title={text.details.etiquette}
+              title="Cara Makan Tradisional"
               content={foodDetails.caraMakan}
               expanded={false}
             />
@@ -248,12 +241,12 @@ export default function FoodScreen({ navigation }) {
             >
               <Text style={styles.captureButtonText}>
                 {isLoading
-                  ? text.analyzing
+                  ? 'Menganalisis...'
                   : !permission?.granted
-                  ? text.permissionButton
+                  ? 'Aktifkan Kamera'
                   : !cameraReady
-                  ? text.cameraReady
-                  : text.capture}
+                  ? 'Menyiapkan Kamera...'
+                  : 'Ambil Foto'}
               </Text>
             </LinearGradient>
           </TouchableOpacity>
@@ -266,7 +259,7 @@ export default function FoodScreen({ navigation }) {
                 end={{ x: 1, y: 1 }}
                 style={styles.resetButtonGradient}
               >
-                <Text style={styles.resetButtonText}>{text.tryAgain}</Text>
+                <Text style={styles.resetButtonText}>Coba Lagi</Text>
               </LinearGradient>
             </TouchableOpacity>
           )}
@@ -274,12 +267,12 @@ export default function FoodScreen({ navigation }) {
 
         {/* Info Section */}
         <View style={styles.infoBox}>
-            <Text style={styles.infoTitle}>{text.tipsTitle}</Text>
+          <Text style={styles.infoTitle}>Tips</Text>
           <Text style={styles.infoText}>
-              • {text.tip1}{'\n'}
-              • {text.tip2}{'\n'}
-              • {text.tip3}{'\n'}
-              • {text.tip4}
+            • Pastikan pencahayaan cukup{'\n'}
+            • Ambil foto dari depan makanan{'\n'}
+            • Hindari bayangan yang terlalu gelap{'\n'}
+            • Foto hanya makanan tanpa piring lain
           </Text>
         </View>
       </ScrollView>
@@ -294,14 +287,9 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingBottom: 12,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 12 : 12,
     backgroundColor: '#1a472a',
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    gap: 12,
   },
   backButton: {
     paddingVertical: 8,

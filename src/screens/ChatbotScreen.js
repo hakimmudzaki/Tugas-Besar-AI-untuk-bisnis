@@ -8,8 +8,9 @@ import {
   ScrollView,
   TextInput,
   KeyboardAvoidingView,
-  Platform,
   ActivityIndicator,
+  Platform,
+  StatusBar,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import GeminiService from '../services/geminiService';
@@ -95,7 +96,7 @@ export default function ChatbotScreen({ navigation }) {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoid}
       >
-        <ScrollView style={styles.messagesContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView style={styles.messagesContainer} contentContainerStyle={styles.messagesContent} showsVerticalScrollIndicator={false}>
           {messages.map((message) => (
             <View
               key={message.id}
@@ -167,7 +168,8 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingBottom: 16,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 16 : 16,
     backgroundColor: '#1a472a',
   },
   headerRow: {
@@ -197,7 +199,10 @@ const styles = StyleSheet.create({
   messagesContainer: {
     flex: 1,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+  },
+  messagesContent: {
+    paddingTop: 12,
+    paddingBottom: 8,
   },
   messageWrapper: {
     marginVertical: 8,
@@ -235,8 +240,10 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     flexDirection: 'row',
+    alignItems: 'flex-end', 
     paddingHorizontal: 12,
-    paddingVertical: 12,
+    paddingTop: 12,
+    paddingBottom: Platform.OS === 'android' ? 42 : 24, 
     backgroundColor: '#ffffff',
     borderTopWidth: 1,
     borderTopColor: '#e0e0e0',

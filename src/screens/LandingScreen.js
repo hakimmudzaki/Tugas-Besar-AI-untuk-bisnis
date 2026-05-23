@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   Dimensions,
   SafeAreaView,
+  Platform,
+  StatusBar,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLanguage } from '../context/LanguageContext';
@@ -61,7 +63,6 @@ export default function LandingScreen({ navigation }) {
               style={styles.ctaGradient}
             >
               <Text style={styles.ctaButtonText}>{texts.common.getStarted}</Text>
-              <Text style={styles.ctaArrow}>  </Text>
             </LinearGradient>
           </TouchableOpacity>
         </View>
@@ -102,7 +103,7 @@ const styles = StyleSheet.create({
   },
   languageWrapper: {
     position: 'absolute',
-    top: 16,
+    top: Platform.OS === 'android' ? StatusBar.currentHeight + 16 : 16,
     right: 16,
     zIndex: 5,
   },
@@ -313,7 +314,8 @@ const styles = StyleSheet.create({
   },
   footer: {
     alignItems: 'center',
-    paddingVertical: 30,
+    
+    paddingBottom: 50,
     borderTopWidth: 1,
     borderTopColor: '#e0e0e0',
   },
