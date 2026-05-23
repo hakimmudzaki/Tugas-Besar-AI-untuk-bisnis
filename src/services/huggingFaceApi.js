@@ -87,9 +87,17 @@ export const queryHuggingFaceModel = async (imageUri) => {
       throw new Error('Prediksi gagal diparse');
     }
 
+    const confidence = Number(finalResult[1] || 0);
+
+    if (confidence < 0.5) {
+      throw new Error(
+        'Confidence prediksi di bawah 50%. Foto kemungkinan kurang tepat atau objek makanan tidak terlihat jelas, silakan ulangi pengambilan foto.'
+      );
+    }
+
     return {
       foodName: finalResult[0] || 'Unknown',
-      confidence: finalResult[1] || 0,
+      confidence,
       raw: finalResult,
     };
   } catch (error) {
