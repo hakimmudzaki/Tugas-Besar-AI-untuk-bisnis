@@ -135,7 +135,7 @@ function isPromptInScope(prompt) {
   return allowedKeywords.some((keyword) => text.includes(keyword));
 }
 
-export async function sendMessage(prompt, apiKeyParam, language = 'id') {
+export async function sendMessage(prompt, apiKeyParam, language = 'id', recentMessages = []) {
   const cleanPrompt = (prompt || '').trim();
   const apiKey = apiKeyParam || getApiKey();
   const rules = RESPONSE_RULES[language] || RESPONSE_RULES.id;
@@ -149,7 +149,11 @@ export async function sendMessage(prompt, apiKeyParam, language = 'id') {
 
   // 1. Updated to standard v1 endpoint and switched from generateText to generateContent
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${DEFAULT_MODEL}:generateContent?key=${apiKey}`;
-  const scopedPrompt = `${rules.instruction}\n\nUser question: ${cleanPrompt}\n\nRespond only if the context is Nusantara cuisine or Nusantara architecture. If the question is out of scope, refuse politely.`;
+  const recentContext = (recentMessages || [])
+    .map((message) => `${message.role === 'user' ? 'User' : 'Assistant'}: ${message.text}`)
+    .join('\n');
+  const historySection = recentContext ? `\n\nRecent conversation (last 5 messages):\n${recentContext}` : '';
+  const scopedPrompt = `${rules.instruction}${historySection}\n\nUser question: ${cleanPrompt}\n\nRespond only if the context is Nusantara cuisine or Nusantara architecture. If the question is out of scope, refuse politely.`;
   
   // 2. Updated the body to match the current Content/Parts schema
   const body = {

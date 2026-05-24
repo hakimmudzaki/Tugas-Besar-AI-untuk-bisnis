@@ -45,27 +45,40 @@ export default function ChatbotScreen({ navigation }) {
     });
   }, [text.initialMessage]);
 
+  const getRecentMessages = (currentMessages) =>
+    currentMessages
+      .filter((message) => !message.loading && message.sender)
+      .filter((message) => !(message.id === 1 && message.sender === 'bot'))
+      .slice(-5)
+      .map((message) => ({
+        role: message.sender === 'user' ? 'user' : 'assistant',
+        text: message.text,
+      }));
+
   const handleSendMessage = () => {
     if (inputText.trim()) {
+      const currentMessages = messages;
       const userMessage = {
-        id: messages.length + 1,
+        id: currentMessages.length + 1,
         text: inputText,
         sender: 'user',
       };
-      setMessages([...messages, userMessage]);
+      const nextMessages = [...currentMessages, userMessage];
+      setMessages(nextMessages);
       const tempBotMessage = {
-        id: messages.length + 2,
+        id: currentMessages.length + 2,
         text: '...',
         sender: 'bot',
         loading: true,
       };
       setMessages((prev) => [...prev, tempBotMessage]);
       const prompt = inputText;
+      const recentMessages = getRecentMessages(nextMessages);
       setInputText('');
 
       (async () => {
         try {
-          const response = await GeminiService.sendMessage(prompt, undefined, language);
+          const response = await GeminiService.sendMessage(prompt, undefined, language, recentMessages);
           setMessages((prev) =>
             prev.map((m) => (m.id === tempBotMessage.id ? { ...m, text: response, loading: false } : m))
           );
