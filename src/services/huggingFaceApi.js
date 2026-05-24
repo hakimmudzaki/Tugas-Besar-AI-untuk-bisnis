@@ -116,7 +116,7 @@ export const queryArchitectureHuggingFaceModel = async (imageUri) => {
   return uploadAndPredict({
     baseUrl: ARCHITECTURE_GRADIO_API_URL,
     imageUri,
-    predictEndpoint: 'predict_food',
+    predictEndpoint: 'predict_building',
     lowConfidenceMessage:
       'Confidence prediksi di bawah 50%. Foto kemungkinan kurang tepat atau objek rumah adat tidak terlihat jelas, silakan ulangi pengambilan foto.',
   });

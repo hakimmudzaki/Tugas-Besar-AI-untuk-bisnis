@@ -68,7 +68,7 @@ DINO_MODEL_PATH = "best_dinov2_standalone.pth"
 model_dino.load_state_dict(torch.load(DINO_MODEL_PATH, map_location=DEVICE))
 model_dino.eval()
 
-def predict_food(image):
+def predict_building(image):
     if image is None:
         return None
 
@@ -82,11 +82,11 @@ def predict_food(image):
     return result
 
 interface = gr.Interface(
-    fn=predict_food,
-    inputs=gr.Image(type="pil", label="Upload Foto Makanan"),
+    fn=predict_building,
+    inputs=gr.Image(type="pil", label="Upload Foto Bangunan"),
     outputs=gr.Label(num_top_classes=3, label="Hasil Prediksi"),
-    title="AksaNusa: Prediksi Makanan Tradisional",
-    description="Upload gambar makanan tradisional untuk diprediksi oleh AI kami (berbasis DINOv2 Transformer)."
+    title="AksaNusa: Prediksi Bangunan Tradisional",
+    description="Upload gambar bangunan tradisional untuk diprediksi oleh AI kami (berbasis DINOv2 Transformer)."
 )
 
 if __name__ == "__main__":
