@@ -19,7 +19,11 @@
       "bundleIdentifier": "com.aksanusa.app"
     },
     "android": {
-      "package": "com.aksanusa.app"
+      "package": "com.aksanusa.app",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "plugins": [
       [
@@ -34,7 +38,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "aksanusa-project"
+        "projectId": "f4d078af-0cd0-406b-9514-4f2c1b7b401d"
       }
     }
   }

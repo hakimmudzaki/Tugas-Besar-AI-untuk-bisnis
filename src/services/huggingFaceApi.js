@@ -87,7 +87,7 @@ async function uploadAndPredict({ baseUrl, imageUri, predictEndpoint, lowConfide
       confidence = Number(finalResult.confidence || finalResult.score || 0);
     }
 
-    if (confidence < 0.5) {
+    if (confidence < 0.25) {
       throw new Error(lowConfidenceMessage);
     }
 
@@ -108,7 +108,7 @@ export const queryHuggingFaceModel = async (imageUri) => {
     imageUri,
     predictEndpoint: 'predict_food',
     lowConfidenceMessage:
-      'Confidence prediksi di bawah 50%. Foto kemungkinan kurang tepat atau objek makanan tidak terlihat jelas, silakan ulangi pengambilan foto.',
+      'Confidence prediksi di bawah 25%. Foto kemungkinan kurang tepat atau objek makanan tidak terlihat jelas, silakan ulangi pengambilan foto.',
   });
 };
 
@@ -118,6 +118,6 @@ export const queryArchitectureHuggingFaceModel = async (imageUri) => {
     imageUri,
     predictEndpoint: 'predict_building',
     lowConfidenceMessage:
-      'Confidence prediksi di bawah 50%. Foto kemungkinan kurang tepat atau objek rumah adat tidak terlihat jelas, silakan ulangi pengambilan foto.',
+      'Confidence prediksi di bawah 25%. Foto kemungkinan kurang tepat atau objek rumah adat tidak terlihat jelas, silakan ulangi pengambilan foto.',
   });
 };
