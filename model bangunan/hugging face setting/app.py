@@ -14,16 +14,16 @@ IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]
 
 label_mapping = {
-    "Banten": 0,
-    "Maluku": 1,
-    "Nusa Tenggara (sasak)": 2,
-    "Papua": 3,
-    "Toraja": 4,
-    "balinese": 5,
-    "batak": 6,
-    "dayak": 7,
-    "javanese": 8,
-    "minangkabau": 9
+    0: "Banten",
+    1: "Maluku",
+    2: "Nusa Tenggara (sasak)",
+    3: "Papua",
+    4: "Toraja",
+    5: "Balinese",
+    6: "Batak",
+    7: "Dayak",
+    8: "Javanese",
+    9: "Minangkabau"
 }
 
 NUM_CLASSES = len(label_mapping)
