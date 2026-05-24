@@ -2,15 +2,30 @@ import Constants from 'expo-constants';
 
 // Stable, recommended model for general tasks
 const DEFAULT_MODEL = 'gemini-2.5-flash';
-const SCOPE_REFUSAL_MESSAGE =
-  'Maaf, saya hanya dapat membantu topik masakan Nusantara dan arsitektur Nusantara. Silakan ajukan pertanyaan dalam konteks tersebut.';
-
-const NUSANTARA_SCOPE_INSTRUCTION =
-  'Anda adalah asisten AKSANUSA. Hanya jawab topik masakan Nusantara dan arsitektur Nusantara. '
-  + 'Topik yang diizinkan: makanan tradisional Indonesia, bahan, bumbu, teknik memasak, sejarah kuliner daerah, '
-  + 'rumah adat, elemen arsitektur tradisional Indonesia, filosofi dan sejarah arsitektur Nusantara. '
-  + 'Topik di luar itu (politik, matematika umum, hukum, kesehatan, coding, dan topik lain) harus ditolak dengan sopan '
-  + 'dengan kalimat singkat dan ajakan untuk kembali ke topik Nusantara. Jangan berikan jawaban substantif untuk topik di luar konteks.';
+const RESPONSE_RULES = {
+  id: {
+    refusal:
+      'Maaf, saya hanya dapat membantu topik masakan Nusantara dan arsitektur Nusantara. Silakan ajukan pertanyaan dalam konteks tersebut.',
+    instruction:
+      'Anda adalah asisten AKSANUSA. Hanya jawab topik masakan Nusantara dan arsitektur Nusantara. '
+      + 'Topik yang diizinkan: makanan tradisional Indonesia, bahan, bumbu, teknik memasak, sejarah kuliner daerah, '
+      + 'rumah adat, elemen arsitektur tradisional Indonesia, filosofi dan sejarah arsitektur Nusantara. '
+      + 'Topik di luar itu (politik, matematika umum, hukum, kesehatan, coding, dan topik lain) harus ditolak dengan sopan '
+      + 'dengan kalimat singkat dan ajakan untuk kembali ke topik Nusantara. Jawab seluruh respons dalam bahasa Indonesia. '
+      + 'Jangan berikan jawaban substantif untuk topik di luar konteks.',
+  },
+  en: {
+    refusal:
+      'Sorry, I can only help with Nusantara cuisine and Nusantara architecture. Please ask within that context.',
+    instruction:
+      'You are the AKSANUSA assistant. Only answer about Nusantara cuisine and Nusantara architecture. '
+      + 'Allowed topics: Indonesian traditional foods, ingredients, spices, cooking techniques, regional culinary history, '
+      + 'traditional houses, elements of Indonesian traditional architecture, and the philosophy and history of Nusantara architecture. '
+      + 'Topics outside this scope (politics, general math, law, health, coding, and anything else) must be politely refused '
+      + 'with a short message and an invitation to return to Nusantara topics. Answer the entire response in English. '
+      + 'Do not provide substantive answers for out-of-scope topics.',
+  },
+};
 
 function formatGeminiResponse(text) {
   // Mulai dengan membersihkan teks secara umum
@@ -90,6 +105,8 @@ function isPromptInScope(prompt) {
     'indonesia',
     'masakan',
     'makanan',
+    'food',
+    'cuisine',
     'kuliner',
     'resep',
     'bumbu',
@@ -100,33 +117,39 @@ function isPromptInScope(prompt) {
     'gudeg',
     'sate',
     'arsitektur',
+    'architecture',
     'rumah adat',
+    'traditional house',
+    'traditional houses',
     'joglo',
     'gadang',
     'tongkonan',
     'honai',
     'candi',
     'budaya',
+    'culture',
     'tradisional',
+    'traditional',
   ];
 
   return allowedKeywords.some((keyword) => text.includes(keyword));
 }
 
-export async function sendMessage(prompt, apiKeyParam) {
+export async function sendMessage(prompt, apiKeyParam, language = 'id') {
   const cleanPrompt = (prompt || '').trim();
   const apiKey = apiKeyParam || getApiKey();
+  const rules = RESPONSE_RULES[language] || RESPONSE_RULES.id;
   if (!apiKey) {
     throw new Error('Gemini API key not found. Set EXPO_PUBLIC_GEMINI_API_KEY in .env.local or expo Config `extra.geminiApiKey`.');
   }
 
   if (!isPromptInScope(cleanPrompt)) {
-    return SCOPE_REFUSAL_MESSAGE;
+    return rules.refusal;
   }
 
   // 1. Updated to standard v1 endpoint and switched from generateText to generateContent
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${DEFAULT_MODEL}:generateContent?key=${apiKey}`;
-  const scopedPrompt = `${NUSANTARA_SCOPE_INSTRUCTION}\n\nPertanyaan pengguna: ${cleanPrompt}\n\nJawab hanya jika konteksnya masakan Nusantara atau arsitektur Nusantara. Jika pertanyaan di luar konteks, tolak dengan sopan.`;
+  const scopedPrompt = `${rules.instruction}\n\nUser question: ${cleanPrompt}\n\nRespond only if the context is Nusantara cuisine or Nusantara architecture. If the question is out of scope, refuse politely.`;
   
   // 2. Updated the body to match the current Content/Parts schema
   const body = {

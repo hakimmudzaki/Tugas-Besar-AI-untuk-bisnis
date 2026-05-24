@@ -18,7 +18,7 @@ import { useLanguage } from '../context/LanguageContext';
 import LanguageToggle from '../components/LanguageToggle';
 
 export default function ChatbotScreen({ navigation }) {
-  const { texts } = useLanguage();
+  const { texts, language } = useLanguage();
   const text = texts.chatbot;
   const [messages, setMessages] = useState([
     {
@@ -65,7 +65,7 @@ export default function ChatbotScreen({ navigation }) {
 
       (async () => {
         try {
-          const response = await GeminiService.sendMessage(prompt);
+          const response = await GeminiService.sendMessage(prompt, undefined, language);
           setMessages((prev) =>
             prev.map((m) => (m.id === tempBotMessage.id ? { ...m, text: response, loading: false } : m))
           );
@@ -114,7 +114,7 @@ export default function ChatbotScreen({ navigation }) {
                 {message.loading ? (
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                     <ActivityIndicator size="small" color="#666" />
-                    <Text style={styles.botMessageText}>Sedang mengetik...</Text>
+                    <Text style={styles.botMessageText}>{text.typing}</Text>
                   </View>
                 ) : (
                   <Text
