@@ -1,0 +1,180 @@
+11.5s 1 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+11.5s 2 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+11.5s 3 0.00s - to python to disable frozen modules.
+11.5s 4 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+12.2s 5 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+12.2s 6 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+12.2s 7 0.00s - to python to disable frozen modules.
+12.2s 8 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+38.0s 9 Menggunakan device: cuda
+38.0s 10 Ukuran gambar: 518x518, Batch Size: 8
+38.0s 11 
+38.0s 12 ==================================================
+38.0s 13 Memuat dan mempersiapkan data training...
+38.0s 14 
+38.0s 15 ==================================================
+38.0s 16 Memuat dan mempersiapkan data training...
+48.0s 17 Total gambar ditemukan sebelum filter: 3790
+48.0s 18 Total gambar setelah file bermasalah dihapus: 3702
+48.0s 19 Ukuran set training: 2961
+48.0s 20 Ukuran set validasi: 741
+48.0s 21 ==================================================
+48.0s 22 
+48.5s 23 
+48.5s 24 ################################################################################
+48.5s 25 ### MEMBANDINGKAN GAMBAR ASLI vs. AUGMENTASI ###
+48.5s 26 ################################################################################
+48.5s 27 
+48.5s 28 Menampilkan contoh untuk: Label 4 (dari /kaggle/input/datasets/mdzkhkm/datarumah/Train/Toraja/tongkonan (372).png)
+49.9s 29 
+49.9s 30 ################################################################################
+49.9s 31 ### MEMULAI BLOK B: TRAINING MODEL DINOv2 (MIXUP/CUTMIX + SWA) ###
+49.9s 32 ################################################################################
+49.9s 33 
+49.9s 34 Menggunakan Ukuran Gambar: 518x518, Batch Size: 8
+51.0s 35 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+51.0s 36 
+51.0s 37 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+54.7s 38 Menggunakan model: vit_base_patch14_dinov2
+54.7s 39 
+54.7s 40 ==================================================
+54.7s 41 TAHAP 1 (DINOv2): Melatih Classifier Head
+54.7s 42 ==================================================
+2148.3s 43 
+2148.3s 44 ==================================================
+2148.3s 45 TAHAP 2 (DINOv2): Melatih Head + Blok Atas
+2148.3s 46 ==================================================
+5666.1s 47 
+5666.1s 48 TAHAP 3 (DINOv2): Fine-tuning Seluruh Model (Mixup/CutMix + SWA)
+5666.1s 49 ==================================================
+6510.6s 50 
+6510.6s 51 Epoch [1/25] | LR: 9.96e-06 | Val F1: 0.9141| Val acc: 0.9474
+6510.8s 52 ✅ Model DINOv2 (Non-SWA) disimpan ke best_dinov2_standalone.pth (Acc terbaik baru: 0.9474)
+7341.1s 53 
+7341.1s 54 Epoch [2/25] | LR: 9.86e-06 | Val F1: 0.9120| Val acc: 0.9514
+7341.7s 55 ✅ Model DINOv2 (Non-SWA) disimpan ke best_dinov2_standalone.pth (Acc terbaik baru: 0.9514)
+8180.8s 56 
+8180.8s 57 Epoch [3/25] | LR: 9.68e-06 | Val F1: 0.8992| Val acc: 0.9474
+9013.6s 58 
+9013.6s 59 Epoch [4/25] | LR: 9.44e-06 | Val F1: 0.8811| Val acc: 0.9406
+9842.5s 60 
+9842.5s 61 Epoch [5/25] | LR: 9.14e-06 | Val F1: 0.9152| Val acc: 0.9555
+9842.9s 62 ✅ Model DINOv2 (Non-SWA) disimpan ke best_dinov2_standalone.pth (Acc terbaik baru: 0.9555)
+10673.8s 63 
+10673.8s 64 Epoch [6/25] | LR: 8.78e-06 | Val F1: 0.8992| Val acc: 0.9474
+11504.1s 65 
+11504.1s 66 Epoch [7/25] | LR: 8.37e-06 | Val F1: 0.8979| Val acc: 0.9501
+12327.6s 67 
+12327.6s 68 Epoch [8/25] | LR: 7.91e-06 | Val F1: 0.9077| Val acc: 0.9514
+13148.9s 69 
+13148.9s 70 Epoch [9/25] | LR: 7.42e-06 | Val F1: 0.9168| Val acc: 0.9555
+13979.2s 71 
+13979.2s 72 Epoch [10/25] | LR: 6.89e-06 | Val F1: 0.9163| Val acc: 0.9541
+14796.9s 73 
+14796.9s 74 Epoch [11/25] | LR: 6.34e-06 | Val F1: 0.9135| Val acc: 0.9555
+15628.0s 75 
+15628.0s 76 Epoch [12/25] | LR: 5.78e-06 | Val F1: 0.9110| Val acc: 0.9541
+16458.8s 77 
+16458.8s 78 Epoch [13/25] | LR: 5.22e-06 | Val F1: 0.9132| Val acc: 0.9555
+17292.4s 79 
+17292.4s 80 Epoch [14/25] | LR: 4.66e-06 | Val F1: 0.9158| Val acc: 0.9541
+18121.6s 81 
+18121.6s 82 Epoch [15/25] | LR: 4.11e-06 | Val F1: 0.8877| Val acc: 0.9460
+18947.2s 83 
+18947.2s 84 Epoch [16/25] | LR: 4.13e-06 | Val F1: 0.9128| Val acc: 0.9541
+19779.4s 85 
+19779.4s 86 Epoch [17/25] | LR: 4.19e-06 | Val F1: 0.8993| Val acc: 0.9501
+20604.6s 87 
+20604.6s 88 Epoch [18/25] | LR: 4.29e-06 | Val F1: 0.9083| Val acc: 0.9528
+21435.8s 89 
+21435.8s 90 Epoch [19/25] | LR: 4.42e-06 | Val F1: 0.9140| Val acc: 0.9555
+22260.3s 91 
+22260.3s 92 Epoch [20/25] | LR: 4.55e-06 | Val F1: 0.9006| Val acc: 0.9487
+23089.1s 93 
+23089.1s 94 Epoch [21/25] | LR: 4.69e-06 | Val F1: 0.9148| Val acc: 0.9541
+23914.8s 95 
+23914.8s 96 Epoch [22/25] | LR: 4.82e-06 | Val F1: 0.9161| Val acc: 0.9541
+24752.1s 97 
+24752.1s 98 Epoch [23/25] | LR: 4.91e-06 | Val F1: 0.9195| Val acc: 0.9568
+24752.7s 99 ✅ Model DINOv2 (Non-SWA) disimpan ke best_dinov2_standalone.pth (Acc terbaik baru: 0.9568)
+25573.5s 100 
+25573.5s 101 Epoch [24/25] | LR: 4.98e-06 | Val F1: 0.9197| Val acc: 0.9568
+26397.0s 102 
+26397.0s 103 Epoch [25/25] | LR: 5.00e-06 | Val F1: 0.9070| Val acc: 0.9528
+26397.0s 104 
+26397.0s 105 Training Model DINOv2 selesai. Model Non-SWA terbaik disimpan di best_dinov2_standalone.pth
+26397.0s 106 
+26397.0s 107 ==================================================
+26397.0s 108 EVALUASI MODEL SWA
+26397.0s 109 ==================================================
+26397.0s 110 Memperbarui Batch Norm untuk model SWA...
+26397.0s 111 Batch Norm SWA diperbarui.
+26397.0s 112 Mengevaluasi model SWA pada validation set...
+26484.0s 113 
+26484.0s 114 --- PERBANDINGAN FINAL ---
+26484.0s 115 Model NON-SWA Terbaik (dari epoch) | Acc: 0.956815
+26484.0s 116 Model SWA Final (rata-rata)       | Acc: 0.954116
+26484.0s 117 --------------------
+26484.0s 118 Peningkatan SWA: -0.002699
+26484.0s 119 
+26484.0s 120 Model Non-SWA (epoch terbaik) lebih baik. Tetap gunakan best_dinov2_standalone.pth.
+26484.2s 121 
+26484.2s 122 ################################################################################
+26484.2s 123 ### MEMBANDINGKAN GAMBAR ASLI vs. AUGMENTASI ###
+26484.2s 124 ################################################################################
+26484.2s 125 
+26484.2s 126 Menampilkan contoh untuk: 5 (dari /kaggle/input/datasets/mdzkhkm/datarumah/Train/balinese/balinese_train_000775.jpg)
+26487.8s 127 
+26487.8s 128 ################################################################################
+26487.8s 129 ### MEMULAI BLOK B: TRAINING MODEL EVA TRANSFORMER (MIXUP/CUTMIX) ###
+26487.8s 130 ################################################################################
+26487.8s 131 
+26487.8s 132 Menggunakan Ukuran Gambar: 224x224, Batch Size: 8
+26495.1s 133 Menggunakan model: eva02_base_patch14_224
+26495.1s 134 Menginisialisasi Mixup/CutMix...
+26495.1s 135 
+26495.1s 136 ==================================================
+26495.1s 137 TAHAP 1 (EVA): Melatih Classifier Head
+26495.1s 138 ==================================================
+28345.1s 139 
+28345.1s 140 ==================================================
+28345.1s 141 TAHAP 2 (EVA): Melatih Head + Blok Atas
+28345.1s 142 ==================================================
+31599.4s 143 TAHAP 3 akan berjalan selama 25 epochs (lebih lama untuk Mixup/CutMix)
+31599.4s 144 
+31599.4s 145 ==================================================
+31599.4s 146 TAHAP 3 (EVA): Fine-tuning Seluruh Model (dengan Mixup/CutMix)
+31599.4s 147 ==================================================
+32364.7s 148 
+32364.7s 149 Epoch [1/25] | LR: 9.96e-06 | Val F1: 0.8528| Val acc: 0.9217
+32364.8s 150 ✅ Model EVA disimpan ke best_eva_standalone.pth (acc terbaik baru: 0.9217)
+33092.2s 151 
+33092.2s 152 Epoch [2/25] | LR: 9.86e-06 | Val F1: 0.8768| Val acc: 0.9339
+33092.6s 153 ✅ Model EVA disimpan ke best_eva_standalone.pth (acc terbaik baru: 0.9339)
+33796.8s 154 
+33796.8s 155 Epoch [3/25] | LR: 9.68e-06 | Val F1: 0.8575| Val acc: 0.9258
+34535.3s 156 
+34535.3s 157 Epoch [4/25] | LR: 9.44e-06 | Val F1: 0.8412| Val acc: 0.9163
+35268.8s 158 
+35268.8s 159 Epoch [5/25] | LR: 9.14e-06 | Val F1: 0.8705| Val acc: 0.9339
+36012.3s 160 
+36012.3s 161 Epoch [6/25] | LR: 8.78e-06 | Val F1: 0.8703| Val acc: 0.9325
+36760.7s 162 
+36760.7s 163 Epoch [7/25] | LR: 8.37e-06 | Val F1: 0.8760| Val acc: 0.9339
+37492.4s 164 
+37492.4s 165 Epoch [8/25] | LR: 7.91e-06 | Val F1: 0.8636| Val acc: 0.9312
+38234.0s 166 
+38234.0s 167 Epoch [9/25] | LR: 7.42e-06 | Val F1: 0.8587| Val acc: 0.9298
+38985.3s 168 
+38985.3s 169 Epoch [10/25] | LR: 6.89e-06 | Val F1: 0.8550| Val acc: 0.9271
+39734.3s 170 
+39734.3s 171 Epoch [11/25] | LR: 6.34e-06 | Val F1: 0.8659| Val acc: 0.9312
+40471.0s 172 
+40471.0s 173 Epoch [12/25] | LR: 5.78e-06 | Val F1: 0.8541| Val acc: 0.9298
+41205.5s 174 
+41205.5s 175 Epoch [13/25] | LR: 5.22e-06 | Val F1: 0.8738| Val acc: 0.9352
+41205.8s 176 ✅ Model EVA disimpan ke best_eva_standalone.pth (acc terbaik baru: 0.9352)
+41952.1s 177 
+41952.1s 178 Epoch [14/25] | LR: 4.66e-06 | Val F1: 0.8697| Val acc: 0.9312
+42679.8s 179 
+42679.8s 180 Epoch [15/25] | LR: 4.11e-06 | Val F1: 0.8725| Val acc: 0.9312
