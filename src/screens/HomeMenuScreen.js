@@ -25,7 +25,7 @@ export default function HomeMenuScreen({ navigation }) {
       color: '#1a472a',
       description: text.architecture.description,
       screen: 'Architecture',
-      disabled: true,
+      disabled: false,
     },
     {
       id: 2,
