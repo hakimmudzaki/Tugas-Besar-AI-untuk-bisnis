@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   StyleSheet,
   View,
@@ -14,31 +14,49 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { ExpandableSection, InfoCard, SpiceLevelBadge } from '../components/FoodDetailComponents';
+import LanguageToggle from '../components/LanguageToggle';
+import { useLanguage } from '../context/LanguageContext';
 import { getFoodDetails } from '../services/foodSearchService';
 import { queryHuggingFaceModel } from '../services/huggingFaceApi';
 
 export default function FoodScreen({ navigation }) {
+  const { texts, language } = useLanguage();
+  const text = texts.food;
   const [isLoading, setIsLoading] = useState(false);
   const [cameraReady, setCameraReady] = useState(false);
-  const [foodName, setFoodName] = useState('Nama Makanan');
-  const [description, setDescription] = useState(
-    'Arahkan kamera ke makanan yang ingin Anda identifikasi'
-  );
+  const [foodName, setFoodName] = useState(text.defaultTitle);
+  const [description, setDescription] = useState(text.instruction);
   const [foodDetails, setFoodDetails] = useState(null);
   const [confidence, setConfidence] = useState(0);
+  const [predictedFoodName, setPredictedFoodName] = useState(null);
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef(null);
+
+  useEffect(() => {
+    if (!predictedFoodName) {
+      setFoodName(text.defaultTitle);
+      setDescription(text.instruction);
+      return;
+    }
+
+    const localizedDetails = getFoodDetails(predictedFoodName, language);
+    if (localizedDetails) {
+      setFoodName(localizedDetails.nama);
+      setDescription(localizedDetails.deskripsi);
+      setFoodDetails(localizedDetails);
+    }
+  }, [language, predictedFoodName, text.defaultTitle, text.instruction]);
 
   const handleCapture = async () => {
     try {
       if (!cameraReady || !cameraRef.current) {
-        Alert.alert('Info', 'Kamera masih menyiapkan preview, coba lagi sebentar.');
+        Alert.alert('Info', text.cameraNotReady);
         return;
       }
 
       if (!permission?.granted) {
         await requestPermission();
-        Alert.alert('Izin kamera diperlukan', 'Aktifkan akses kamera untuk menampilkan preview dan mengambil foto.');
+        Alert.alert('Izin kamera diperlukan', text.cameraPermissionNeed);
         return;
       }
 
@@ -50,17 +68,16 @@ export default function FoodScreen({ navigation }) {
       setIsLoading(true);
 
       if (!capturedPhoto?.uri) {
-        Alert.alert('Info', 'Kamera belum siap, coba beberapa saat lagi.');
+        Alert.alert('Info', text.cameraWait);
         return;
       }
 
       const prediction = await queryHuggingFaceModel(capturedPhoto.uri, capturedPhoto.base64);
-
-      const predictedFoodName = prediction?.foodName || 'Rendang';
+      const detectedFoodName = prediction?.foodName || 'Rendang';
       const confidenceScore = prediction?.confidence || 0;
 
-      // Search food details from JSON
-      const details = getFoodDetails(predictedFoodName);
+      const details = getFoodDetails(detectedFoodName, language);
+      setPredictedFoodName(detectedFoodName);
 
       if (details) {
         setFoodName(details.nama);
@@ -68,21 +85,23 @@ export default function FoodScreen({ navigation }) {
         setFoodDetails(details);
         setConfidence((confidenceScore * 100).toFixed(1));
       } else {
-        Alert.alert('Info', 'Makanan tidak ditemukan dalam database');
-        setFoodName('Tidak Dikenal');
-        setDescription('Model berhasil mendeteksi gambar, tetapi data detail makanan belum tersedia di database.');
+        Alert.alert('Info', text.infoNotFound);
+        setFoodName(text.defaultTitle);
+        setDescription(text.infoNotFoundDesc);
+        setFoodDetails(null);
       }
     } catch (error) {
       setIsLoading(false);
-      Alert.alert('Error', 'Gagal menganalisis: ' + error.message);
+      Alert.alert('Error', `${text.errorAnalyzePrefix}${error.message}`);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleReset = () => {
-    setFoodName('Nama Makanan');
-    setDescription('Arahkan kamera ke makanan yang ingin Anda identifikasi');
+    setPredictedFoodName(null);
+    setFoodName(text.defaultTitle);
+    setDescription(text.instruction);
     setFoodDetails(null);
     setConfidence(0);
     setCameraReady(false);
@@ -92,9 +111,12 @@ export default function FoodScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← Kembali</Text>
-        </TouchableOpacity>
+        <View style={styles.headerRow}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Text style={styles.backButtonText}>{texts.common.back}</Text>
+          </TouchableOpacity>
+          <LanguageToggle />
+        </View>
       </View>
 
       <ScrollView
@@ -102,36 +124,30 @@ export default function FoodScreen({ navigation }) {
         scrollEventThrottle={16}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Food Name Title */}
         <View style={styles.titleContainer}>
           <Text style={styles.foodTitle}>{foodName}</Text>
-          {confidence > 0 && (
-            <Text style={styles.confidenceText}>Kepercayaan: {confidence}%</Text>
-          )}
+          {confidence > 0 && <Text style={styles.confidenceText}>{text.confidencePrefix}: {confidence}%</Text>}
         </View>
 
-        {/* Camera View */}
         <View style={styles.cameraContainer}>
           <View style={styles.cameraPlaceholder}>
             {!permission ? (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#D4AF37" />
-                <Text style={styles.loadingText}>Menyiapkan kamera...</Text>
+                <Text style={styles.loadingText}>{text.loading}</Text>
               </View>
             ) : !permission.granted ? (
               <View style={styles.permissionContainer}>
-                <Text style={styles.permissionTitle}>Akses kamera belum aktif</Text>
-                <Text style={styles.permissionText}>
-                  Aktifkan izin kamera untuk melihat preview langsung dan mengambil foto makanan.
-                </Text>
+                <Text style={styles.permissionTitle}>{text.permissionTitle}</Text>
+                <Text style={styles.permissionText}>{text.permissionText}</Text>
                 <TouchableOpacity style={styles.permissionButton} onPress={requestPermission}>
-                  <Text style={styles.permissionButtonText}>Aktifkan Kamera</Text>
+                  <Text style={styles.permissionButtonText}>{text.permissionButton}</Text>
                 </TouchableOpacity>
               </View>
             ) : isLoading ? (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#D4AF37" />
-                <Text style={styles.loadingText}>Menganalisis...</Text>
+                <Text style={styles.loadingText}>{text.analyzing}</Text>
               </View>
             ) : (
               <>
@@ -141,25 +157,10 @@ export default function FoodScreen({ navigation }) {
                   facing="back"
                   onCameraReady={() => setCameraReady(true)}
                 />
-
-                {/* Camera Icon */}
-                
-
-                {/* Corner Markers */}
-                <View style={styles.cornerMarker}>
-                  <View style={[styles.corner, styles.topLeft]} />
-                </View>
-                <View style={styles.cornerMarker}>
-                  <View style={[styles.corner, styles.topRight]} />
-                </View>
-                <View style={styles.cornerMarker}>
-                  <View style={[styles.corner, styles.bottomLeft]} />
-                </View>
-                <View style={styles.cornerMarker}>
-                  <View style={[styles.corner, styles.bottomRight]} />
-                </View>
-
-                {/* Crosshair */}
+                <View style={styles.cornerMarker}><View style={[styles.corner, styles.topLeft]} /></View>
+                <View style={styles.cornerMarker}><View style={[styles.corner, styles.topRight]} /></View>
+                <View style={styles.cornerMarker}><View style={[styles.corner, styles.bottomLeft]} /></View>
+                <View style={styles.cornerMarker}><View style={[styles.corner, styles.bottomRight]} /></View>
                 <View style={styles.crosshair}>
                   <View style={styles.crosshairH} />
                   <View style={styles.crosshairV} />
@@ -169,64 +170,35 @@ export default function FoodScreen({ navigation }) {
           </View>
         </View>
 
-        {/* Instruction Text */}
-        <Text style={styles.instructionText}>
-          Posisikan makanan di tengah frame untuk hasil identifikasi yang lebih akurat
-        </Text>
+        <Text style={styles.instructionText}>{text.instruction}</Text>
 
-        {/* Description Box */}
         <View style={styles.descriptionBox}>
-          <Text style={styles.descriptionLabel}>Deskripsi</Text>
+          <Text style={styles.descriptionLabel}>{text.descriptionLabel}</Text>
           <Text style={styles.descriptionText}>{description}</Text>
         </View>
 
-        {/* Food Details Section */}
         {foodDetails && (
           <View style={styles.detailsSection}>
-            {/* Quick Info Row */}
             <View style={styles.quickInfoRow}>
-              <InfoCard label="Daerah Asal" value={foodDetails.daerahAsal} />
+              <InfoCard label={text.details.origin} value={foodDetails.daerahAsal} />
               <View style={styles.spiceContainer}>
-                <Text style={styles.spiceLabel}>Tingkat Pedas</Text>
+                <Text style={styles.spiceLabel}>{text.details.spice}</Text>
                 <SpiceLevelBadge level={foodDetails.spiciness} size="large" />
               </View>
             </View>
 
-            {/* Expandable Sections */}
+            <ExpandableSection title={text.details.ingredients} content={foodDetails.bahanUtama} />
+            <ExpandableSection title={text.details.howToMake} content={foodDetails.caraMembuat} />
+            <ExpandableSection title={text.details.nutrition} content={foodDetails.kalori} />
             <ExpandableSection
-              title="Bahan Utama & Rempah"
-              content={foodDetails.bahanUtama}
+              title={text.details.allergens}
+              content={foodDetails.alergen === '-' ? text.details.noAllergen : foodDetails.alergen}
             />
-
-            <ExpandableSection
-              title="Cara Membuat"
-              content={foodDetails.caraMembuat}
-            />
-
-            <ExpandableSection
-              title="Estimasi Kalori & Nutrisi"
-              content={foodDetails.kalori}
-            />
-
-            <ExpandableSection
-              title="Alergen"
-              content={foodDetails.alergen === '-' ? 'Tidak ada alergen utama' : foodDetails.alergen}
-            />
-
-            <ExpandableSection
-              title="Filosofi & Sejarah"
-              content={foodDetails.filosofi}
-            />
-
-            <ExpandableSection
-              title="Cara Makan Tradisional"
-              content={foodDetails.caraMakan}
-              expanded={false}
-            />
+            <ExpandableSection title={text.details.philosophy} content={foodDetails.filosofi} />
+            <ExpandableSection title={text.details.etiquette} content={foodDetails.caraMakan} expanded={false} />
           </View>
         )}
 
-        {/* Button Group */}
         <View style={styles.buttonGroup}>
           <TouchableOpacity
             style={styles.captureButton}
@@ -241,17 +213,17 @@ export default function FoodScreen({ navigation }) {
             >
               <Text style={styles.captureButtonText}>
                 {isLoading
-                  ? 'Menganalisis...'
+                  ? text.analyzing
                   : !permission?.granted
-                  ? 'Aktifkan Kamera'
+                  ? text.permissionButton
                   : !cameraReady
-                  ? 'Menyiapkan Kamera...'
-                  : 'Ambil Foto'}
+                  ? text.cameraReady
+                  : text.capture}
               </Text>
             </LinearGradient>
           </TouchableOpacity>
 
-          {foodName !== 'Nama Makanan' && (
+          {foodName !== text.defaultTitle && (
             <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
               <LinearGradient
                 colors={['#999999', '#b3b3b3']}
@@ -259,20 +231,19 @@ export default function FoodScreen({ navigation }) {
                 end={{ x: 1, y: 1 }}
                 style={styles.resetButtonGradient}
               >
-                <Text style={styles.resetButtonText}>Coba Lagi</Text>
+                <Text style={styles.resetButtonText}>{text.tryAgain}</Text>
               </LinearGradient>
             </TouchableOpacity>
           )}
         </View>
 
-        {/* Info Section */}
         <View style={styles.infoBox}>
-          <Text style={styles.infoTitle}>Tips</Text>
+          <Text style={styles.infoTitle}>{text.tipsTitle}</Text>
           <Text style={styles.infoText}>
-            • Pastikan pencahayaan cukup{'\n'}
-            • Ambil foto dari depan makanan{'\n'}
-            • Hindari bayangan yang terlalu gelap{'\n'}
-            • Foto hanya makanan tanpa piring lain
+            • {text.tip1}{'\n'}
+            • {text.tip2}{'\n'}
+            • {text.tip3}{'\n'}
+            • {text.tip4}
           </Text>
         </View>
       </ScrollView>
@@ -290,6 +261,12 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 12 : 12,
     backgroundColor: '#1a472a',
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: 12,
   },
   backButton: {
     paddingVertical: 8,
@@ -379,14 +356,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#D4AF37',
     fontWeight: '600',
-  },
-  cameraIcon: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
-  },
-  cameraIconText: {
-    fontSize: 32,
   },
   cornerMarker: {
     position: 'absolute',
@@ -509,9 +478,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 12,
-  },
-  captureIcon: {
-    fontSize: 24,
   },
   captureButtonText: {
     fontSize: 16,

@@ -106,14 +106,14 @@ export default function ArchitectureScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerRow}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Text style={styles.backButtonText}>{text.headerBack || texts.common.back}</Text>
+            <Text style={styles.backButtonText}>{texts.common.back}</Text>
           </TouchableOpacity>
           <LanguageToggle />
         </View>
-        <Text style={styles.headerTitle}>{text.headerTitle}</Text>
       </View>
 
       <ScrollView
@@ -254,26 +254,23 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 20,
-    paddingBottom: 16,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 16 : 16,
+    paddingBottom: 12,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 12 : 12,
+    backgroundColor: '#1a472a',
+  },
+  headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 12,
     gap: 12,
   },
   backButton: {
-    paddingVertical: 4,
+    paddingVertical: 8,
   },
   backButtonText: {
     fontSize: 16,
     fontWeight: '600',
     color: '#D4AF37',
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#ffffff',
   },
   image: {
     width: '100%',
