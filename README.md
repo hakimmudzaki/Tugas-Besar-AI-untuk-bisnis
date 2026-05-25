@@ -1,6 +1,6 @@
 # Tugas Besar AI untuk Bisnis
 
-Repositori ini berisi aplikasi AksaNusa / NusaRasa, yaitu aplikasi berbasis AI computer vision untuk mengenali makanan tradisional dan rumah adat Indonesia.
+Repositori ini berisi aplikasi AksaNusa, yaitu aplikasi berbasis AI computer vision untuk mengenali makanan tradisional dan rumah adat Indonesia.
 
 ## Isi Repo
 
